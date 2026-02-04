@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte Uber 2025 - CFE Calificados</title>
-    <!-- Librerías Necesarias en orden correcto -->
+    <!-- Librerías Necesarias -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
     <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #F1F5F9;
+            background-color: #F8FAFC;
         }
         .cfe-gradient {
             background: linear-gradient(135deg, #006E46 0%, #00AE6E 100%);
@@ -36,25 +34,21 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useMemo, useEffect } = React;
-        
-        // Acceso seguro a Recharts
+        const { useState, useMemo } = React;
         const { 
             BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-            ResponsiveContainer, ComposedChart, Cell, AreaChart, Area 
+            ResponsiveContainer, ComposedChart, Cell
         } = window.Recharts;
 
-        // Componente de Iconos Robusto con fallbacks SVG
-        const Icon = ({ name, size = 24, className = "" }) => {
+        // --- COMPONENTE DE ICONO SVG ---
+        const Icon = ({ name, className = "" }) => {
             const icons = {
-                DollarSign: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
-                Car: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>,
-                TrendingUp: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
-                Users: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
-                Search: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-                ShieldCheck: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>,
-                X: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-                Info: <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                DollarSign: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
+                Car: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>,
+                TrendingUp: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
+                Users: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+                ShieldCheck: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>,
+                Search: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             };
             return icons[name] || null;
         };
@@ -63,250 +57,247 @@
             primary: '#006E46',
             secondary: '#00AE6E',
             support: '#5C6670',
-            greenLight: '#A1D55D',
-            yellow: '#FFDB58',
-            grayLight: '#A2AAAD',
-            dark: '#004D31'
+            greenLight: '#A1D55D'
         };
 
-        // --- DATOS REALES (907 viajes | $159,589.21 total) ---
-        const DATA = [
-            {num: 1, nombre: "Adriana García Limón", area: "Administración", totalViajes: 20, totalMonto: 3149.40},
-            {num: 2, nombre: "Ana Cecilia Moreno Mejia", area: "Administración", totalViajes: 196, totalMonto: 31932.51},
-            {num: 3, nombre: "Cervando Ponce Bejero", area: "Administración", totalViajes: 85, totalMonto: 11160.03},
-            {num: 4, nombre: "César Román Baños Zavala", area: "Administración", totalViajes: 3, totalMonto: 219.89},
-            {num: 5, nombre: "Jesus Ricardo López Hernández", area: "Administración", totalViajes: 160, totalMonto: 27795.53},
-            {num: 6, nombre: "Marco A. Pérez de Acha", area: "Administración", totalViajes: 6, totalMonto: 474.85},
-            {num: 7, nombre: "Saúl Guillermo Medina García", area: "Administración", totalViajes: 26, totalMonto: 6998.74},
-            {num: 8, nombre: "Zulema Osorio Amarillas", area: "Administración", totalViajes: 1, totalMonto: 460.52},
-            {num: 9, nombre: "Arturo Gibran Jaimes Vera", area: "Atención y Servicio al Cliente", totalViajes: 23, totalMonto: 5185.20},
-            {num: 10, nombre: "Ashanti Avendaño Vargas", area: "Atención y Servicio al Cliente", totalViajes: 3, totalMonto: 568.92},
-            {num: 11, nombre: "Felix Higinio Rivera Baqueiro", area: "Atención y Servicio al Cliente", totalViajes: 26, totalMonto: 4873.95},
-            {num: 12, nombre: "Flora Elba Montero Navarrete", area: "Atención y Servicio al Cliente", totalViajes: 25, totalMonto: 4664.50},
-            {num: 13, nombre: "Jhoan Gerardo Morales Chino", area: "Atención y Servicio al Cliente", totalViajes: 15, totalMonto: 3319.29},
-            {num: 14, nombre: "Miguel Angel Rodríguez Peña", area: "Atención y Servicio al Cliente", totalViajes: 11, totalMonto: 2984.29},
-            {num: 15, nombre: "Valentin Zavala Zavala", area: "Atención y Servicio al Cliente", totalViajes: 61, totalMonto: 13860.12},
-            {num: 16, nombre: "Benjamin Felix Lepe", area: "Comercial", totalViajes: 15, totalMonto: 2739.76},
-            {num: 17, nombre: "Edith Marín Rojas", area: "Comercial", totalViajes: 9, totalMonto: 1210.81},
-            {num: 18, nombre: "Karla Avalos Ovando", area: "Comercial", totalViajes: 12, totalMonto: 2171.62},
-            {num: 19, nombre: "María Cristina Núñez López", area: "Comercial", totalViajes: 8, totalMonto: 1771.84},
-            {num: 20, nombre: "Raúl González Martínez", area: "Comercial", totalViajes: 3, totalMonto: 229.75},
-            {num: 21, nombre: "Edgar Alejandro Mosqueda Mendez", area: "Finanzas", totalViajes: 9, totalMonto: 1354.77},
-            {num: 22, nombre: "Adriana Terán Martínez", area: "Gestión de Energía", totalViajes: 1, totalMonto: 55.07},
-            {num: 23, nombre: "Alejandro Adame Ramírez", area: "Gestión de Energía", totalViajes: 8, totalMonto: 942.67},
-            {num: 24, nombre: "Carlos Gamma Gutiérrez", area: "Gestión de Energía", totalViajes: 5, totalMonto: 2463.48},
-            {num: 25, nombre: "Julio César Hernández Luna", area: "Gestión de Energía", totalViajes: 3, totalMonto: 499.95},
-            {num: 26, nombre: "Daniel Alberto Leal Nava", area: "Jurídico", totalViajes: 34, totalMonto: 6484.84},
-            {num: 27, nombre: "Felipe Tadeo Rico Viccon", area: "Jurídico", totalViajes: 89, totalMonto: 15028.62},
-            {num: 28, nombre: "Francisco Orozco Suárez", area: "Jurídico", totalViajes: 2, totalMonto: 419.90},
-            {num: 29, nombre: "Guadalupe Cruz Sánchez", area: "Jurídico", totalViajes: 4, totalMonto: 346.66},
-            {num: 30, nombre: "Hector Gerardo Tellez Quintanilla", area: "Jurídico", totalViajes: 1, totalMonto: 129.96},
-            {num: 31, nombre: "Jonatan S. Duarte Montes de Oca", area: "Jurídico", totalViajes: 9, totalMonto: 1341.76},
-            {num: 32, nombre: "Pedro Rodríguez Catachea", area: "Jurídico", totalViajes: 34, totalMonto: 4750.01}
-        ];
+        const MESES_FULL = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-        const AREAS_LIST = ["Todas", "Administración", "Atención y Servicio al Cliente", "Comercial", "Finanzas", "Gestión de Energía", "Jurídico"];
+        // --- BASE DE DATOS INTEGRAL (32 Colaboradores | 907 Viajes | $159,589.21) ---
+        const DATA = [
+            {num: 1, nombre: "Adriana García Limón", area: "Administración", mensual: { Febrero: {v:7, m:678.28}, Marzo: {v:10, m:2127.28}, Abril: {v:3, m:343.84} }},
+            {num: 2, nombre: "Ana Cecilia Moreno Mejia", area: "Administración", mensual: { Enero: {v:18, m:2385.49}, Febrero: {v:12, m:2119.57}, Marzo: {v:7, m:1136.91}, Abril: {v:12, m:1965.09}, Mayo: {v:23, m:4215.26}, Junio: {v:32, m:5185.21}, Julio: {v:19, m:2498.43}, Agosto: {v:24, m:4406.11}, Septiembre: {v:20, m:3471.48}, Octubre: {v:21, m:3404.69}, Noviembre: {v:5, m:604.37}, Diciembre: {v:3, m:539.90} }},
+            {num: 3, nombre: "Cervando Ponce Bejero", area: "Administración", mensual: { Enero: {v:3, m:256.61}, Febrero: {v:2, m:209.96}, Marzo: {v:1, m:229.95}, Abril: {v:3, m:297.72}, Mayo: {v:5, m:570.83}, Junio: {v:4, m:822.05}, Julio: {v:6, m:620.50}, Agosto: {v:10, m:1408.09}, Septiembre: {v:5, m:809.41}, Octubre: {v:17, m:2022.58}, Noviembre: {v:22, m:2771.98}, Diciembre: {v:7, m:1140.35} }},
+            {num: 4, nombre: "César Román Baños Zavala", area: "Administración", mensual: { Marzo: {v:2, m:129.93}, Abril: {v:1, m:89.96} }},
+            {num: 5, nombre: "Jesus Ricardo López Hernández", area: "Administración", mensual: { Enero: {v:6, m:1032.82}, Febrero: {v:18, m:2960.47}, Marzo: {v:5, m:811.83}, Abril: {v:10, m:1426.61}, Mayo: {v:10, m:2004.58}, Junio: {v:6, m:1179.06}, Julio: {v:9, m:1424.87}, Agosto: {v:6, m:946.73}, Septiembre: {v:12, m:1777.24}, Octubre: {v:28, m:3919.67}, Noviembre: {v:18, m:3509.14}, Diciembre: {v:32, m:6802.51} }},
+            {num: 6, nombre: "Marco A. Pérez de Acha", area: "Administración", mensual: { Marzo: {v:2, m:104.92}, Junio: {v:4, m:369.93} }},
+            {num: 7, nombre: "Saúl Guillermo Medina García", area: "Administración", mensual: { Enero: {v:13, m:3318.05}, Mayo: {v:1, m:291.74}, Septiembre: {v:4, m:479.80}, Diciembre: {v:8, m:2909.15} }},
+            {num: 8, nombre: "Zulema Osorio Amarillas", area: "Administración", mensual: { Junio: {v:1, m:460.52} }},
+            {num: 9, nombre: "Arturo Gibran Jaimes Vera", area: "Atención y Servicio al Cliente", mensual: { Enero: {v:2, m:390.39}, Febrero: {v:5, m:1184.27}, Marzo: {v:5, m:1079.72}, Abril: {v:1, m:229.97}, Septiembre: {v:1, m:181.15}, Octubre: {v:2, m:438.95}, Noviembre: {v:6, m:1530.82}, Diciembre: {v:1, m:149.93} }},
+            {num: 10, nombre: "Ashanti Avendaño Vargas", area: "Atención y Servicio al Cliente", mensual: { Junio: {v:2, m:208.94}, Diciembre: {v:1, m:359.98} }},
+            {num: 11, nombre: "Felix Higinio Rivera Baqueiro", area: "Atención y Servicio al Cliente", mensual: { Febrero: {v:5, m:659.85}, Abril: {v:5, m:659.74}, Mayo: {v:8, m:2186.62}, Junio: {v:1, m:69.98}, Julio: {v:2, m:190.65}, Agosto: {v:2, m:241.70}, Noviembre: {v:3, m:865.41} }},
+            {num: 12, nombre: "Flora Elba Montero Navarrete", area: "Atención y Servicio al Cliente", mensual: { Febrero: {v:2, m:413.57}, Marzo: {v:2, m:359.92}, Abril: {v:2, m:426.55}, Octubre: {v:9, m:1210.73}, Noviembre: {v:6, m:954.76}, Diciembre: {v:4, m:1298.97} }},
+            {num: 13, nombre: "Jhoan Gerardo Morales Chino", area: "Atención y Servicio al Cliente", mensual: { Enero: {v:3, m:1479.79}, Julio: {v:1, m:316.24}, Agosto: {v:2, m:209.89}, Septiembre: {v:6, m:902.50}, Octubre: {v:3, m:410.87} }},
+            {num: 14, nombre: "Miguel Angel Rodríguez Peña", area: "Atención y Servicio al Cliente", mensual: { Enero: {v:2, m:410.81}, Febrero: {v:1, m:269.97}, Junio: {v:1, m:199.98}, Julio: {v:2, m:661.34}, Septiembre: {v:1, m:239.93}, Noviembre: {v:2, m:522.33}, Diciembre: {v:2, m:679.93} }},
+            {num: 15, nombre: "Valentin Zavala Zavala", area: "Atención y Servicio al Cliente", mensual: { Enero: {v:4, m:806.89}, Febrero: {v:12, m:2729.49}, Marzo: {v:10, m:2395.57}, Abril: {v:2, m:529.96}, Junio: {v:3, m:277.68}, Julio: {v:9, m:859.93}, Septiembre: {v:4, m:989.89}, Octubre: {v:5, m:1392.12}, Noviembre: {v:11, m:3709.10}, Diciembre: {v:1, m:169.49} }},
+            {num: 16, nombre: "Benjamin Felix Lepe", area: "Comercial", mensual: { Febrero: {v:3, m:569.68}, Marzo: {v:1, m:169.96}, Mayo: {v:2, m:289.88}, Julio: {v:3, m:566.91}, Agosto: {v:2, m:389.84}, Septiembre: {v:2, m:483.59}, Noviembre: {v:2, m:269.90} }},
+            {num: 17, nombre: "Edith Marín Rojas", area: "Comercial", mensual: { Agosto: {v:1, m:289.98}, Septiembre: {v:3, m:400.43}, Octubre: {v:1, m:136.83}, Noviembre: {v:2, m:220.16}, Diciembre: {v:2, m:163.41} }},
+            {num: 18, nombre: "Karla Avalos Ovando", area: "Comercial", mensual: { Junio: {v:2, m:605.36}, Agosto: {v:2, m:252.82}, Septiembre: {v:2, m:429.30}, Octubre: {v:2, m:231.60}, Noviembre: {v:1, m:139.92}, Diciembre: {v:3, m:512.62} }},
+            {num: 19, nombre: "María Cristina Núñez López", area: "Comercial", mensual: { Octubre: {v:4, m:865.92}, Diciembre: {v:4, m:905.92} }},
+            {num: 20, nombre: "Raúl González Martínez", area: "Comercial", mensual: { Abril: {v:2, m:99.80}, Diciembre: {v:1, m:129.95} }},
+            {num: 21, nombre: "Edgar Alejandro Mosqueda Mendez", area: "Finanzas", mensual: { Marzo: {v:4, m:425.36}, Mayo: {v:2, m:199.90}, Diciembre: {v:3, m:729.51} }},
+            {num: 22, nombre: "Adriana Terán Martínez", area: "Gestión de Energía", mensual: { Agosto: {v:1, m:55.07} }},
+            {num: 23, nombre: "Alejandro Adame Ramírez", area: "Gestión de Energía", mensual: { Febrero: {v:2, m:359.94}, Abril: {v:2, m:109.86}, Diciembre: {v:4, m:472.87} }},
+            {num: 24, nombre: "Carlos Gamma Gutiérrez", area: "Gestión de Energía", mensual: { Marzo: {v:4, m:2273.54}, Diciembre: {v:1, m:189.94} }},
+            {num: 25, nombre: "Julio César Hernández Luna", area: "Gestión de Energía", mensual: { Diciembre: {v:3, m:499.95} }},
+            {num: 26, nombre: "Daniel Alberto Leal Nava", area: "Jurídico ", mensual: { Agosto: {v:9, m:1927.97}, Septiembre: {v:10, m:1719.52}, Octubre: {v:12, m:2209.76}, Diciembre: {v:3, m:627.59} }},
+            {num: 27, nombre: "Felipe Tadeo Rico Viccon", area: "Jurídico ", mensual: { Enero: {v:6, m:807.47}, Febrero: {v:5, m:628.83}, Marzo: {v:7, m:677.01}, Mayo: {v:2, m:419.86}, Junio: {v:2, m:350.18}, Julio: {v:12, m:2283.52}, Agosto: {v:7, m:1236.96}, Septiembre: {v:8, m:1682.36}, Octubre: {v:17, m:3345.95}, Noviembre: {v:11, m:1605.19}, Diciembre: {v:12, m:1991.29} }},
+            {num: 28, nombre: "Francisco Orozco Suárez", area: "Jurídico ", mensual: { Diciembre: {v:2, m:419.90} }},
+            {num: 29, nombre: "Guadalupe Cruz Sánchez", area: "Jurídico ", mensual: { Octubre: {v:4, m:346.66} }},
+            {num: 30, nombre: "Hector Gerardo Tellez Quintanilla", area: "Jurídico ", mensual: { Agosto: {v:1, m:129.96} }},
+            {num: 31, nombre: "Jonatan S. Duarte Montes de Oca", area: "Jurídico ", mensual: { Marzo: {v:2, m:274.34}, Abril: {v:1, m:269.59}, Agosto: {v:4, m:452.87}, Octubre: {v:2, m:344.96} }},
+            {num: 32, nombre: "Pedro Rodríguez Catachea", area: "Jurídico ", mensual: { Enero: {v:2, m:469.84}, Abril: {v:6, m:1086.70}, Junio: {v:1, m:269.93}, Julio: {v:2, m:369.94}, Agosto: {v:1, m:89.96}, Septiembre: {v:5, m:504.63}, Octubre: {v:9, m:1059.44}, Noviembre: {v:7, m:789.63}, Diciembre: {v:1, m:109.94} }}
+        ];
 
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
 
         function App() {
-            const [searchTerm, setSearchTerm] = useState('');
+            const [selectedMonth, setSelectedMonth] = useState('Todos');
             const [selectedArea, setSelectedArea] = useState('Todas');
-            const [selectedPerson, setSelectedPerson] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
 
+            // --- LÓGICA DE PROCESAMIENTO ---
+            const processedData = useMemo(() => {
+                return DATA.map(p => {
+                    let v = 0, m = 0;
+                    if (selectedMonth === 'Todos') {
+                        Object.values(p.mensual).forEach(entry => {
+                            v += entry.v;
+                            m += entry.m;
+                        });
+                    } else {
+                        const entry = p.mensual[selectedMonth];
+                        if (entry) { v = entry.v; m = entry.m; }
+                    }
+                    return { ...p, currentViajes: v, currentMonto: m };
+                });
+            }, [selectedMonth]);
+
+            // Filtrado y Ordenamiento de Mayor a Menor por Monto
             const filteredList = useMemo(() => {
-                let result = DATA;
+                let result = processedData;
                 if (selectedArea !== 'Todas') result = result.filter(d => d.area === selectedArea);
                 if (searchTerm) result = result.filter(d => d.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-                return result;
-            }, [selectedArea, searchTerm]);
+                
+                // Ordenar de Mayor a Menor Monto
+                return [...result].sort((a, b) => b.currentMonto - a.currentMonto);
+            }, [processedData, selectedArea, searchTerm]);
 
             const stats = useMemo(() => {
-                const totalAmount = filteredList.reduce((acc, curr) => acc + curr.totalMonto, 0);
-                const totalTrips = filteredList.reduce((acc, curr) => acc + curr.totalViajes, 0);
-                return { totalAmount, totalTrips, avg: totalTrips > 0 ? totalAmount / totalTrips : 0 };
+                const totalMonto = filteredList.reduce((acc, curr) => acc + curr.currentMonto, 0);
+                const totalViajes = filteredList.reduce((acc, curr) => acc + curr.currentViajes, 0);
+                return { totalMonto, totalViajes, avg: totalViajes > 0 ? totalMonto / totalViajes : 0 };
             }, [filteredList]);
 
             const chartDataArea = useMemo(() => {
-                return AREAS_LIST.filter(a => a !== 'Todas').map(area => {
-                    const perArea = DATA.filter(p => p.area === area);
-                    const monto = perArea.reduce((sum, p) => sum + p.totalMonto, 0);
-                    const viajes = perArea.reduce((sum, p) => sum + p.totalViajes, 0);
-                    return { name: area.split(' ')[0], monto, viajes, fullName: area };
+                const areas = [...new Set(DATA.map(d => d.area))];
+                return areas.map(area => {
+                    const group = processedData.filter(p => p.area === area);
+                    const monto = group.reduce((s, p) => s + p.currentMonto, 0);
+                    const viajes = group.reduce((s, p) => s + p.currentViajes, 0);
+                    return { name: area.split(' ')[0], monto, viajes };
                 }).sort((a, b) => b.monto - a.monto);
-            }, []);
+            }, [processedData]);
 
             return (
-                <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
-                    <div className="w-full max-w-7xl">
-                        
-                        {/* HEADER */}
-                        <header className="mb-8 rounded-[2rem] overflow-hidden shadow-2xl">
-                            <div className="cfe-gradient p-8 md:p-12 text-white flex flex-col lg:flex-row justify-between items-center gap-6 relative">
-                                <div className="flex flex-col sm:flex-row items-center gap-6 z-10 text-center sm:text-left">
-                                    <div className="bg-white p-4 rounded-3xl shadow-xl flex-shrink-0">
-                                        <div className="text-[#006E46] font-black text-xl">CFE</div>
+                <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-10">
+                    {/* HEADER */}
+                    <header className="rounded-[2.5rem] overflow-hidden shadow-2xl">
+                        <div className="cfe-gradient p-8 text-white">
+                            <div className="flex flex-col lg:flex-row justify-between items-center gap-8 relative z-10">
+                                <div className="flex items-center gap-6">
+                                    <div className="bg-white p-4 rounded-3xl shadow-xl flex items-center justify-center w-16 h-16">
+                                        <span className="text-[#006E46] font-black text-xl">CFE</span>
                                     </div>
                                     <div>
-                                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-1 text-[#A1D55D]">
-                                            <Icon name="ShieldCheck" size={16} />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">CFE Calificados</span>
+                                        <div className="flex items-center gap-2 mb-1 text-[#A1D55D] font-bold text-[10px] uppercase tracking-widest">
+                                            <Icon name="ShieldCheck" className="w-4 h-4" /> CFE Calificados
                                         </div>
-                                        <h1 className="text-3xl md:text-5xl font-black tracking-tighter italic">Reporte Uber 2025</h1>
+                                        <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter">Reporte Uber 2025</h1>
                                     </div>
                                 </div>
 
-                                <div className="z-10 flex items-center gap-3 bg-black/10 p-2 rounded-2xl backdrop-blur-md border border-white/10 w-full lg:w-auto">
-                                    <div className="flex items-center gap-2 px-4 py-2 w-full">
-                                        <span className="text-[#A1D55D] font-bold text-xs uppercase">Área:</span>
+                                <div className="flex flex-col sm:flex-row gap-4 bg-black/10 p-3 rounded-3xl backdrop-blur-md border border-white/10 w-full lg:w-auto">
+                                    <div className="flex flex-col px-4 border-r border-white/10 min-w-[140px]">
+                                        <label className="text-[10px] font-black text-[#A1D55D] uppercase mb-1">Periodo</label>
                                         <select 
-                                            className="bg-transparent text-xs font-bold outline-none cursor-pointer w-full text-white"
+                                            className="bg-transparent text-sm font-bold outline-none cursor-pointer text-white"
+                                            value={selectedMonth}
+                                            onChange={(e) => setSelectedMonth(e.target.value)}
+                                        >
+                                            <option value="Todos" className="text-slate-900">Anual Consolidado</option>
+                                            {MESES_FULL.map(m => <option key={m} value={m} className="text-slate-900">{m}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col px-4 min-w-[140px]">
+                                        <label className="text-[10px] font-black text-[#A1D55D] uppercase mb-1">Filtrar Área</label>
+                                        <select 
+                                            className="bg-transparent text-sm font-bold outline-none cursor-pointer text-white"
                                             value={selectedArea}
                                             onChange={(e) => setSelectedArea(e.target.value)}
                                         >
-                                            {AREAS_LIST.map(a => <option key={a} value={a} style={{color: '#334155'}}>{a}</option>)}
+                                            <option value="Todas" className="text-slate-900">Todas las áreas</option>
+                                            {[...new Set(DATA.map(d => d.area))].map(a => <option key={a} value={a} className="text-slate-900">{a}</option>)}
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                        </header>
-
-                        {/* KPIs */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                            <div className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4 border-[#006E46]">
-                                <div className="p-3 rounded-xl bg-[#006E46] text-white w-fit mb-4 shadow-lg"><Icon name="DollarSign" /></div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inversión Total</p>
-                                <h3 className="text-2xl font-black text-[#006E46]">{formatCurrency(stats.totalAmount)}</h3>
-                            </div>
-                            <div className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4 border-[#00AE6E]">
-                                <div className="p-3 rounded-xl bg-[#00AE6E] text-white w-fit mb-4 shadow-lg"><Icon name="Car" /></div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Viajes Totales</p>
-                                <h3 className="text-2xl font-black text-[#006E46]">{stats.totalTrips.toLocaleString()}</h3>
-                            </div>
-                            <div className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4 border-[#5C6670]">
-                                <div className="p-3 rounded-xl bg-[#5C6670] text-white w-fit mb-4 shadow-lg"><Icon name="TrendingUp" /></div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Costo Promedio</p>
-                                <h3 className="text-2xl font-black text-[#006E46]">{formatCurrency(stats.avg)}</h3>
-                            </div>
-                            <div className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4 border-[#A2AAAD]">
-                                <div className="p-3 rounded-xl bg-[#A2AAAD] text-white w-fit mb-4 shadow-lg"><Icon name="Users" /></div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Plantilla</p>
-                                <h3 className="text-2xl font-black text-[#006E46]">32</h3>
-                            </div>
                         </div>
+                    </header>
 
-                        {/* GRAFICO AREA */}
-                        <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-sm mb-10 overflow-hidden">
-                            <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-3 mb-10 text-[#006E46]">
-                                <div className="w-1.5 h-6 rounded-full bg-[#006E46]"></div>
-                                Análisis por Centro de Costos (Anual)
-                            </h3>
-                            <div className="h-[300px] md:h-[400px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <ComposedChart data={chartDataArea} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#5C6670', fontSize: 10, fontWeight: 'bold'}} />
-                                        <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#5C6670', fontSize: 10}} tickFormatter={(v) => `$${v/1000}k`} />
-                                        <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#00AE6E', fontSize: 10}} />
-                                        <Tooltip 
-                                            contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px'}}
-                                            formatter={(value, name) => name === "monto" ? [formatCurrency(value), "Gasto"] : [value, "Viajes"]}
-                                        />
-                                        <Bar yAxisId="left" dataKey="monto" fill="#006E46" radius={[10, 10, 0, 0]} barSize={40} />
-                                        <Bar yAxisId="right" dataKey="viajes" fill="#00AE6E" radius={[10, 10, 0, 0]} barSize={40} />
-                                    </ComposedChart>
-                                </ResponsiveContainer>
+                    {/* KPIs */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                            {t: "Inversión Auditada", v: formatCurrency(stats.totalMonto), i: "DollarSign", c: "#006E46"},
+                            {t: "Servicios Uber", v: stats.totalViajes, i: "Car", c: "#00AE6E"},
+                            {t: "Ticket Promedio", v: formatCurrency(stats.avg), i: "TrendingUp", c: "#5C6670"},
+                            {t: "Usuarios Activos", v: filteredList.filter(p => p.currentViajes > 0).length, i: "Users", c: "#A2AAAD"}
+                        ].map((k, idx) => (
+                            <div key={idx} className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4" style={{borderBottomColor: k.c}}>
+                                <div className="p-3 rounded-2xl text-white w-fit mb-4 shadow-lg" style={{backgroundColor: k.c}}><Icon name={k.i} /></div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{k.t}</p>
+                                <h3 className="text-2xl font-black text-[#006E46]">{k.v}</h3>
                             </div>
-                        </div>
-
-                        {/* TABLA Y BUSCADOR */}
-                        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mb-12 items-start">
-                            <div className="xl:col-span-3 bg-white rounded-[2.5rem] shadow-sm overflow-hidden">
-                                <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl shadow-inner"><Icon name="Search" size={18} /></div>
-                                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Auditoría Individual</h3>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Buscar por nombre..." 
-                                        className="w-full md:w-80 px-6 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold focus:ring-4 focus:ring-[#006E46]/10 outline-none transition-all"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                                <div className="overflow-x-auto custom-scrollbar">
-                                    <table className="w-full text-left text-xs min-w-[600px]">
-                                        <thead>
-                                            <tr className="bg-slate-50/80 text-slate-400 font-black uppercase tracking-widest border-b border-slate-100">
-                                                <th className="px-8 py-5">Colaborador</th>
-                                                <th className="px-8 py-5">Área</th>
-                                                <th className="px-8 py-5 text-center">Viajes</th>
-                                                <th className="px-8 py-5 text-right">Inversión</th>
-                                                <th className="px-8 py-5"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-50">
-                                            {filteredList.map((person) => (
-                                                <tr 
-                                                    key={person.num} 
-                                                    onClick={() => setSelectedPerson(person)}
-                                                    className={`hover:bg-emerald-50 transition-all cursor-pointer group ${selectedPerson?.num === person.num ? 'bg-emerald-50' : ''}`}
-                                                >
-                                                    <td className="px-8 py-5">
-                                                        <p className="font-black text-slate-800 group-hover:text-[#006E46]">{person.nombre}</p>
-                                                        <p className="text-[9px] text-slate-400 uppercase tracking-widest">ID: {String(person.num).padStart(3, '0')}</p>
-                                                    </td>
-                                                    <td className="px-8 py-5">
-                                                        <span className="text-[9px] font-black px-3 py-1 rounded-xl bg-white border border-slate-200 text-slate-500 uppercase">{person.area}</span>
-                                                    </td>
-                                                    <td className="px-8 py-5 text-center font-bold text-slate-600">{person.totalViajes}</td>
-                                                    <td className="px-8 py-5 text-right font-black text-slate-900">{formatCurrency(person.totalMonto)}</td>
-                                                    <td className="px-8 py-5 text-right"><span className="text-slate-300">→</span></td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {/* FICHA TECNICA */}
-                            <div className="xl:col-span-1">
-                                {selectedPerson ? (
-                                    <div className="bg-[#004D31] text-white p-8 rounded-[3rem] shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 sticky top-6">
-                                        <div className="flex justify-between items-start mb-10">
-                                            <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md shadow-lg border border-white/5"><Icon name="Users" size={20} /></div>
-                                            <button onClick={() => setSelectedPerson(null)} className="text-white/40 hover:text-white"><Icon name="X" size={20} /></button>
-                                        </div>
-                                        <h3 className="text-xl font-black tracking-tight mb-1">{selectedPerson.nombre}</h3>
-                                        <p className="text-[10px] font-black text-[#A1D55D] uppercase tracking-[0.4em] mb-10">{selectedPerson.area}</p>
-                                        <div className="space-y-4 mb-8">
-                                            <div className="bg-black/20 p-4 rounded-2xl">
-                                                <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-1">Gasto Total Anual</p>
-                                                <p className="text-lg font-black">{formatCurrency(selectedPerson.totalMonto)}</p>
-                                            </div>
-                                            <div className="bg-black/20 p-4 rounded-2xl">
-                                                <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-1">Viajes Realizados</p>
-                                                <p className="text-lg font-black">{selectedPerson.totalViajes} Viajes</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-4 p-4 bg-white/5 rounded-2xl">
-                                            <Icon name="Info" size={16} className="text-[#A1D55D] shrink-0" />
-                                            <p className="text-[10px] font-bold text-white/80 leading-relaxed">Costo promedio de {formatCurrency(selectedPerson.totalMonto / selectedPerson.totalViajes)} por servicio auditado.</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="h-full bg-white border-4 border-dashed border-slate-200 rounded-[3rem] p-10 flex flex-col items-center justify-center text-center opacity-60 min-h-[300px]">
-                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Seleccione un colaborador para auditoría técnica</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <footer className="text-center text-slate-300 text-[10px] font-black uppercase tracking-[0.8em] py-16 border-t border-slate-100">
-                            Gestión de Datos • CFE Calificados • Auditoría 2025
-                        </footer>
+                        ))}
                     </div>
+
+                    {/* TABLA DE AUDITORÍA (Ahora arriba del gráfico) */}
+                    <div className="bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-100">
+                        <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Detalle Individual de Auditoría</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Ordenado de mayor a menor monto</p>
+                            </div>
+                            <div className="relative w-full md:w-80">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
+                                    <Icon name="Search" className="w-4 h-4" />
+                                </div>
+                                <input 
+                                    type="text" 
+                                    placeholder="Buscar colaborador..." 
+                                    className="w-full pl-11 pr-6 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold focus:ring-4 focus:ring-[#006E46]/10 outline-none transition-all shadow-inner"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-left text-xs min-w-[750px]">
+                                <thead>
+                                    <tr className="bg-slate-50/80 text-slate-400 font-black uppercase tracking-widest border-b border-slate-100">
+                                        <th className="px-10 py-6">Colaborador</th>
+                                        <th className="px-10 py-6">Área de Adscripción</th>
+                                        <th className="px-10 py-6 text-center">Viajes</th>
+                                        <th className="px-10 py-6 text-right">Inversión</th>
+                                        <th className="px-10 py-6 text-right">Ticket Prom.</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {filteredList.map((p) => (
+                                        <tr key={p.num} className="hover:bg-emerald-50 transition-all group">
+                                            <td className="px-10 py-5">
+                                                <p className="font-black text-slate-800 group-hover:text-[#006E46] text-sm">{p.nombre}</p>
+                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Audit ID: {String(p.num).padStart(3, '0')}</p>
+                                            </td>
+                                            <td className="px-10 py-5"><span className="text-[9px] font-black px-3 py-1 rounded-xl bg-white border border-slate-200 text-slate-500 uppercase">{p.area}</span></td>
+                                            <td className="px-10 py-5 text-center font-bold text-slate-600">{p.currentViajes || '-'}</td>
+                                            <td className="px-10 py-5 text-right font-black text-slate-900">{p.currentMonto > 0 ? formatCurrency(p.currentMonto) : '-'}</td>
+                                            <td className="px-10 py-5 text-right font-bold text-[#00AE6E]">{p.currentViajes > 0 ? formatCurrency(p.currentMonto / p.currentViajes) : '-'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* GRÁFICO POR ÁREA (Ahora al final) */}
+                    <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-sm overflow-hidden mb-10">
+                        <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-[#006E46] flex items-center gap-3 text-center sm:text-left">
+                                <div className="w-1.5 h-6 rounded-full bg-[#006E46]"></div>
+                                Análisis Comparativo de Eficiencia por Área
+                            </h3>
+                            <div className="flex gap-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#006E46]"></div>
+                                    <span className="text-[10px] font-bold uppercase text-slate-400">Gasto ($)</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#00AE6E]"></div>
+                                    <span className="text-[10px] font-bold uppercase text-slate-400">Viajes (Qty)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="h-[350px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ComposedChart data={chartDataArea} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10, fontWeight: 'bold'}} />
+                                    <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} />
+                                    <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#00AE6E', fontSize: 10}} />
+                                    <Tooltip 
+                                        contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px'}}
+                                        formatter={(val, name) => [name === 'monto' ? formatCurrency(val) : val, name === 'monto' ? 'Inversión' : 'Viajes']}
+                                    />
+                                    <Bar yAxisId="left" dataKey="monto" fill="#006E46" radius={[10, 10, 0, 0]} barSize={40} />
+                                    <Bar yAxisId="right" dataKey="viajes" fill="#00AE6E" radius={[10, 10, 0, 0]} barSize={40} />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <footer className="text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.8em] py-10">
+                        Inteligencia Financiera • CFE Calificados • 2025
+                    </footer>
                 </div>
             );
         }
