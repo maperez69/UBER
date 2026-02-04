@@ -1,0 +1,333 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
+  ComposedChart, Cell
+} from 'recharts';
+import { 
+  DollarSign, 
+  Car, 
+  TrendingUp, 
+  Users, 
+  Search, 
+  Filter, 
+  ChevronRight, 
+  ArrowUpRight,
+  LayoutDashboard,
+  X,
+  Info,
+  Briefcase,
+  ShieldCheck,
+  FileText
+} from 'lucide-react';
+
+// --- CONFIGURACIÓN DE IDENTIDAD CFE CALIFICADOS ---
+const CFE_COLORS = {
+  primary: '#006E46',    // Verde Pantone 7727 C
+  secondary: '#00AE6E',  // Verde Pantone 7480 C
+  support: '#5C6670',    // Gris Pantone 431 C
+  greenLight: '#A1D55D', // Verde 374 C
+  yellow: '#FFDB58',     // Amarillo 122 C
+  grayLight: '#A2AAAD',  // Gris 429 C
+  dark: '#004D31'
+};
+
+const LOGO_URL = "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop"; 
+
+/**
+ * BASE DE DATOS AUDITADA FINAL - CERO ERRORES
+ * Totales: 907 Viajes | $159,589.21 Importe Total
+ * Lista exacta de 32 colaboradores basada en el reporte técnico.
+ */
+const DATA = [
+  {num: 1, nombre: "Adriana García Limón", area: "Administración", totalViajes: 20, totalMonto: 3149.40},
+  {num: 2, nombre: "Ana Cecilia Moreno Mejia", area: "Administración", totalViajes: 196, totalMonto: 31932.51},
+  {num: 3, nombre: "Cervando Ponce Bejero", area: "Administración", totalViajes: 85, totalMonto: 11160.03},
+  {num: 4, nombre: "César Román Baños Zavala", area: "Administración", totalViajes: 3, totalMonto: 219.89},
+  {num: 5, nombre: "Jesus Ricardo López Hernández", area: "Administración", totalViajes: 160, totalMonto: 27795.53},
+  {num: 6, nombre: "Marco A. Pérez de Acha", area: "Administración", totalViajes: 6, totalMonto: 474.85},
+  {num: 7, nombre: "Saúl Guillermo Medina García", area: "Administración", totalViajes: 26, totalMonto: 6998.74},
+  {num: 8, nombre: "Zulema Osorio Amarillas", area: "Administración", totalViajes: 1, totalMonto: 460.52},
+  {num: 9, nombre: "Arturo Gibran Jaimes Vera", area: "Atención y Servicio al Cliente", totalViajes: 23, totalMonto: 5185.20},
+  {num: 10, nombre: "Ashanti Avendaño Vargas", area: "Atención y Servicio al Cliente", totalViajes: 3, totalMonto: 568.92},
+  {num: 11, nombre: "Felix Higinio Rivera Baqueiro", area: "Atención y Servicio al Cliente", totalViajes: 26, totalMonto: 4873.95},
+  {num: 12, nombre: "Flora Elba Montero Navarrete", area: "Atención y Servicio al Cliente", totalViajes: 25, totalMonto: 4664.50},
+  {num: 13, nombre: "Jhoan Gerardo Morales Chino", area: "Atención y Servicio al Cliente", totalViajes: 15, totalMonto: 3319.29},
+  {num: 14, nombre: "Miguel Angel Rodríguez Peña", area: "Atención y Servicio al Cliente", totalViajes: 11, totalMonto: 2984.29},
+  {num: 15, nombre: "Valentin Zavala Zavala", area: "Atención y Servicio al Cliente", totalViajes: 61, totalMonto: 13860.12},
+  {num: 16, nombre: "Benjamin Felix Lepe", area: "Comercial", totalViajes: 15, totalMonto: 2739.76},
+  {num: 17, nombre: "Edith Marín Rojas", area: "Comercial", totalViajes: 9, totalMonto: 1210.81},
+  {num: 18, nombre: "Karla Avalos Ovando", area: "Comercial", totalViajes: 12, totalMonto: 2171.62},
+  {num: 19, nombre: "María Cristina Núñez López", area: "Comercial", totalViajes: 8, totalMonto: 1771.84},
+  {num: 20, nombre: "Raúl González Martínez", area: "Comercial", totalViajes: 3, totalMonto: 229.75},
+  {num: 21, nombre: "Edgar Alejandro Mosqueda Mendez", area: "Finanzas", totalViajes: 9, totalMonto: 1354.77},
+  {num: 22, nombre: "Adriana Terán Martínez", area: "Gestión de Energía", totalViajes: 1, totalMonto: 55.07},
+  {num: 23, nombre: "Alejandro Adame Ramírez", area: "Gestión de Energía", totalViajes: 8, totalMonto: 942.67},
+  {num: 24, nombre: "Carlos Gamma Gutiérrez", area: "Gestión de Energía", totalViajes: 5, totalMonto: 2463.48},
+  {num: 25, nombre: "Julio César Hernández Luna", area: "Gestión de Energía", totalViajes: 3, totalMonto: 499.95},
+  {num: 26, nombre: "Daniel Alberto Leal Nava", area: "Jurídico", totalViajes: 34, totalMonto: 6484.84},
+  {num: 27, nombre: "Felipe Tadeo Rico Viccon", area: "Jurídico", totalViajes: 89, totalMonto: 15028.62},
+  {num: 28, nombre: "Francisco Orozco Suárez", area: "Jurídico", totalViajes: 2, totalMonto: 419.90},
+  {num: 29, nombre: "Guadalupe Cruz Sánchez", area: "Jurídico", totalViajes: 4, totalMonto: 346.66},
+  {num: 30, nombre: "Hector Gerardo Tellez Quintanilla", area: "Jurídico", totalViajes: 1, totalMonto: 129.96},
+  {num: 31, nombre: "Jonatan S. Duarte Montes de Oca", area: "Jurídico", totalViajes: 9, totalMonto: 1341.76},
+  {num: 32, nombre: "Pedro Rodríguez Catachea", area: "Jurídico", totalViajes: 34, totalMonto: 4750.01}
+];
+
+const AREAS_LIST = ["Todas", "Administración", "Atención y Servicio al Cliente", "Comercial", "Finanzas", "Gestión de Energía", "Jurídico"];
+
+const formatCurrency = (val) => 
+  new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
+
+// --- COMPONENTES UI ADAPTATIVOS ---
+
+const StatCard = ({ title, value, sub, icon: Icon, color }) => (
+  <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between h-full hover:shadow-md transition-all border-b-4" style={{ borderBottomColor: color }}>
+    <div className="flex justify-between items-start mb-4">
+      <div className="p-3 rounded-xl text-white shadow-lg" style={{ backgroundColor: color }}>
+        <Icon size={22} />
+      </div>
+    </div>
+    <div>
+      <p className="text-[10px] font-bold text-[#5C6670] uppercase tracking-widest mb-1">{title}</p>
+      <h3 className="text-xl md:text-2xl font-black tracking-tight" style={{ color: CFE_COLORS.primary }}>{value}</h3>
+      {sub && <p className="text-[9px] md:text-[10px] text-slate-500 font-medium mt-1 uppercase tracking-tighter">{sub}</p>}
+    </div>
+  </div>
+);
+
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedArea, setSelectedArea] = useState('Todas');
+  const [selectedPerson, setSelectedPerson] = useState(null);
+
+  // --- LÓGICA DE FILTRADO ---
+
+  const filteredList = useMemo(() => {
+    let result = DATA;
+    if (selectedArea !== 'Todas') result = result.filter(d => d.area === selectedArea);
+    if (searchTerm) result = result.filter(d => d.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+    return result;
+  }, [selectedArea, searchTerm]);
+
+  const globalStats = useMemo(() => {
+    const totalAmount = filteredList.reduce((acc, curr) => acc + curr.totalMonto, 0);
+    const totalTrips = filteredList.reduce((acc, curr) => acc + curr.totalViajes, 0);
+    return { totalAmount, totalTrips, avg: totalTrips > 0 ? totalAmount / totalTrips : 0 };
+  }, [filteredList]);
+
+  const chartDataArea = useMemo(() => {
+    return AREAS_LIST.filter(a => a !== 'Todas').map(area => {
+      const perArea = DATA.filter(p => p.area === area);
+      const monto = perArea.reduce((sum, p) => sum + p.totalMonto, 0);
+      const viajes = perArea.reduce((sum, p) => sum + p.totalViajes, 0);
+      return { name: area.split(' ')[0], monto, viajes, fullName: area };
+    }).sort((a, b) => b.monto - a.monto);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#F1F5F9] font-['Helvetica_Neue',Arial,sans-serif] text-slate-900 flex flex-col items-center">
+      <div className="w-full max-w-7xl px-4 md:px-8 py-6">
+        
+        {/* Header Institucional CFE */}
+        <header className="mb-10 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-100/50">
+          <div className="bg-gradient-to-r from-[#006E46] to-[#00AE6E] p-8 md:p-12 text-white relative text-center sm:text-left">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-8 relative z-10">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="bg-white p-4 rounded-3xl shadow-xl flex-shrink-0">
+                  <img src={LOGO_URL} alt="CFE" className="h-10 w-auto object-contain" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-1 text-[#A1D55D]">
+                    <ShieldCheck size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">CFE Calificados</span>
+                  </div>
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tighter leading-none italic">Reporte Uber 2025</h1>
+                </div>
+              </div>
+
+              {/* Selector Institucional */}
+              <div className="flex items-center gap-3 bg-black/10 p-2 rounded-2xl backdrop-blur-md border border-white/10 w-full lg:w-auto">
+                <div className="flex items-center gap-2 px-4 py-2 w-full">
+                  <Briefcase size={16} className="text-[#A1D55D]" />
+                  <select 
+                    className="bg-transparent text-xs font-bold outline-none cursor-pointer w-full"
+                    value={selectedArea}
+                    onChange={(e) => setSelectedArea(e.target.value)}
+                  >
+                    {AREAS_LIST.map(a => <option key={a} value={a} className="text-slate-900">{a}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+          </div>
+        </header>
+
+        {/* KPIs Centrales Anuales */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <StatCard title="Inversión Consolidada" value={formatCurrency(globalStats.totalAmount)} sub="Ejercicio Anual 2025" icon={DollarSign} color={CFE_COLORS.primary} />
+          <StatCard title="Servicios Realizados" value={globalStats.totalTrips.toLocaleString()} sub="907 Viajes Registrados" icon={Car} color={CFE_COLORS.secondary} />
+          <StatCard title="Costo Medio / Viaje" value={formatCurrency(globalStats.avg)} sub="Indicador de Eficiencia" icon={TrendingUp} color={CFE_COLORS.support} />
+          <StatCard title="Plantilla Única" value="32" sub="Usuarios con Actividad" icon={Users} color={CFE_COLORS.grayLight} />
+        </div>
+
+        {/* Gráfico de Áreas: Inversión y Volumen */}
+        <div className="grid grid-cols-1 mb-10">
+          <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-6">
+               <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-3" style={{ color: CFE_COLORS.primary }}>
+                 <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: CFE_COLORS.primary }}></div>
+                 Análisis por Centro de Costos
+               </h3>
+               <div className="flex gap-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CFE_COLORS.primary }}></div>
+                    <span className="text-[10px] font-bold text-[#5C6670] uppercase tracking-tighter">Gasto ($)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CFE_COLORS.secondary }}></div>
+                    <span className="text-[10px] font-bold text-[#5C6670] uppercase tracking-tighter">Viajes (Qty)</span>
+                  </div>
+               </div>
+            </div>
+            <div className="h-[300px] md:h-[400px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartDataArea} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: CFE_COLORS.support, fontSize: 9, fontWeight: 'bold'}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: CFE_COLORS.support, fontSize: 9}} tickFormatter={(v) => `$${v/1000}k`} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: CFE_COLORS.secondary, fontSize: 9}} />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', fontSize: '11px'}}
+                    formatter={(value, name) => name === "monto" ? [formatCurrency(value), "Inversión"] : [value, "Viajes"]}
+                  />
+                  <Bar yAxisId="left" dataKey="monto" fill={CFE_COLORS.primary} radius={[10, 10, 0, 0]} barSize={45} />
+                  <Bar yAxisId="right" dataKey="viajes" fill={CFE_COLORS.secondary} radius={[10, 10, 0, 0]} barSize={45} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabla de Auditoría e Informe Individual */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start mb-12">
+          
+          <div className="xl:col-span-3 bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+            <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div className="flex items-center gap-4">
+                 <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl border border-slate-100 shadow-inner">
+                    <FileText size={22}/>
+                 </div>
+                 <div>
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Auditoría Individual</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{filteredList.length} Colaboradores Auditados</p>
+                 </div>
+              </div>
+              <div className="relative w-full md:w-96">
+                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                 <input 
+                   type="text" 
+                   placeholder="Buscar nombre para auditar..." 
+                   className="w-full pl-14 pr-8 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#006E46]/10 transition-all shadow-inner"
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                 />
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto max-h-[600px]">
+              <table className="w-full text-left text-xs min-w-[650px]">
+                <thead>
+                  <tr className="bg-slate-50/80 text-slate-400 font-black uppercase tracking-widest border-b border-slate-100">
+                    <th className="px-10 py-6">Colaborador</th>
+                    <th className="px-10 py-6">Área de Adscripción</th>
+                    <th className="px-10 py-6 text-center">Viajes Totales</th>
+                    <th className="px-10 py-6 text-right">Inversión</th>
+                    <th className="px-10 py-6"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filteredList.map((person) => (
+                    <tr 
+                      key={person.num} 
+                      onClick={() => setSelectedPerson(person)}
+                      className={`hover:bg-emerald-50/50 transition-all cursor-pointer group ${selectedPerson?.num === person.num ? 'bg-emerald-50/80' : ''}`}
+                    >
+                      <td className="px-10 py-6">
+                        <p className="font-black text-slate-800 group-hover:text-[#006E46] transition-colors">{person.nombre}</p>
+                        <p className="text-[9px] text-slate-400 font-black tracking-widest mt-0.5 uppercase">ID: {String(person.num).padStart(3, '0')}</p>
+                      </td>
+                      <td className="px-10 py-6">
+                        <span className="text-[9px] font-black px-4 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-500 uppercase shadow-sm">
+                          {person.area}
+                        </span>
+                      </td>
+                      <td className="px-10 py-6 text-center font-bold text-slate-600">{person.totalViajes}</td>
+                      <td className="px-10 py-6 text-right font-black text-slate-900">{formatCurrency(person.totalMonto)}</td>
+                      <td className="px-10 py-6 text-right">
+                        <ChevronRight size={18} className={`transition-all duration-300 ${selectedPerson?.num === person.num ? 'translate-x-1 text-[#006E46]' : 'text-slate-200'}`} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Ficha Técnica Individual */}
+          <div className="xl:col-span-1 h-full">
+            {selectedPerson ? (
+              <div className="bg-[#004D31] text-white p-10 rounded-[3rem] shadow-2xl sticky top-6 animate-in fade-in slide-in-from-right-12 duration-700 border border-white/5 overflow-hidden">
+                <div className="flex justify-between items-start mb-10">
+                  <div className="p-3.5 bg-white/10 rounded-2xl backdrop-blur-md shadow-lg border border-white/5">
+                    <Users size={24} className="text-emerald-300" />
+                  </div>
+                  <button onClick={() => setSelectedPerson(null)} className="text-white/40 hover:text-white transition-all hover:rotate-90 duration-500">
+                    <X size={24} />
+                  </button>
+                </div>
+                
+                <h3 className="text-2xl font-black tracking-tight mb-1 leading-tight">{selectedPerson.nombre}</h3>
+                <p className="text-[11px] font-black text-[#A1D55D] uppercase tracking-[0.4em] mb-10">{selectedPerson.area}</p>
+                
+                <div className="grid grid-cols-1 gap-5 mb-10">
+                   <div className="bg-black/20 p-5 rounded-[2rem] border border-white/5 shadow-inner text-center">
+                      <p className="text-[9px] font-black text-white/30 uppercase mb-2 tracking-widest text-center">Importe Anual</p>
+                      <p className="text-lg font-black tracking-tight text-white text-center">{formatCurrency(selectedPerson.totalMonto)}</p>
+                   </div>
+                   <div className="bg-black/20 p-5 rounded-[2rem] border border-white/5 shadow-inner text-center">
+                      <p className="text-[9px] font-black text-white/30 uppercase mb-2 tracking-widest text-center">Viajes Totales</p>
+                      <p className="text-lg font-black tracking-tight text-white text-center">{selectedPerson.totalViajes}</p>
+                   </div>
+                </div>
+
+                <div className="space-y-5">
+                   <div className="flex items-start gap-5 p-5 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-sm">
+                      <Info size={20} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-white/40 mb-1 tracking-widest">Análisis</p>
+                        <p className="text-xs font-bold text-white/80 leading-relaxed tracking-tight">Costo promedio de {formatCurrency(selectedPerson.totalMonto / selectedPerson.totalViajes)} por cada servicio.</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            ) : (
+              <div className="h-full bg-white border-4 border-dashed border-slate-100 rounded-[3rem] p-12 flex flex-col items-center justify-center text-center opacity-80">
+                <div className="p-10 bg-slate-50 rounded-full mb-8 shadow-inner">
+                  <ArrowUpRight size={48} className="text-slate-200" />
+                </div>
+                <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.4em] leading-loose max-w-[220px]">
+                  Seleccione un colaborador para desplegar ficha técnica de auditoría
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <footer className="text-center text-slate-300 text-[11px] font-black uppercase tracking-[0.8em] py-16 border-t border-slate-100 italic">
+          Gestión de Datos • CFE Calificados • Auditoría Ejercicio 2025
+        </footer>
+      </div>
+    </div>
+  );
+}
