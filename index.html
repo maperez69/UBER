@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reporte Uber 2025 - CFE Calificados</title>
     <!-- Librerías Necesarias -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -16,17 +16,23 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
         }
         .cfe-gradient {
             background: linear-gradient(135deg, #006E46 0%, #00AE6E 100%);
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
+        }
+        /* Ajuste para que los selectores no se vean cortados en iOS */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
         }
     </style>
 </head>
@@ -40,15 +46,17 @@
             ResponsiveContainer, ComposedChart, Cell
         } = window.Recharts;
 
-        // --- COMPONENTE DE ICONO SVG ---
         const Icon = ({ name, className = "" }) => {
             const icons = {
-                DollarSign: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
-                Car: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>,
-                TrendingUp: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
-                Users: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
-                ShieldCheck: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>,
-                Search: <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                DollarSign: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
+                Car: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>,
+                TrendingUp: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
+                Users: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+                ShieldCheck: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>,
+                Search: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+                ChevronDown: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+                X: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+                Info: <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             };
             return icons[name] || null;
         };
@@ -62,7 +70,6 @@
 
         const MESES_FULL = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-        // --- BASE DE DATOS INTEGRAL (32 Colaboradores | 907 Viajes | $159,589.21) ---
         const DATA = [
             {num: 1, nombre: "Adriana García Limón", area: "Administración", mensual: { Febrero: {v:7, m:678.28}, Marzo: {v:10, m:2127.28}, Abril: {v:3, m:343.84} }},
             {num: 2, nombre: "Ana Cecilia Moreno Mejia", area: "Administración", mensual: { Enero: {v:18, m:2385.49}, Febrero: {v:12, m:2119.57}, Marzo: {v:7, m:1136.91}, Abril: {v:12, m:1965.09}, Mayo: {v:23, m:4215.26}, Junio: {v:32, m:5185.21}, Julio: {v:19, m:2498.43}, Agosto: {v:24, m:4406.11}, Septiembre: {v:20, m:3471.48}, Octubre: {v:21, m:3404.69}, Noviembre: {v:5, m:604.37}, Diciembre: {v:3, m:539.90} }},
@@ -104,16 +111,13 @@
             const [selectedMonth, setSelectedMonth] = useState('Todos');
             const [selectedArea, setSelectedArea] = useState('Todas');
             const [searchTerm, setSearchTerm] = useState('');
+            const [selectedPerson, setSelectedPerson] = useState(null);
 
-            // --- LÓGICA DE PROCESAMIENTO ---
             const processedData = useMemo(() => {
                 return DATA.map(p => {
                     let v = 0, m = 0;
                     if (selectedMonth === 'Todos') {
-                        Object.values(p.mensual).forEach(entry => {
-                            v += entry.v;
-                            m += entry.m;
-                        });
+                        Object.values(p.mensual).forEach(entry => { v += entry.v; m += entry.m; });
                     } else {
                         const entry = p.mensual[selectedMonth];
                         if (entry) { v = entry.v; m = entry.m; }
@@ -122,13 +126,10 @@
                 });
             }, [selectedMonth]);
 
-            // Filtrado y Ordenamiento de Mayor a Menor por Monto
             const filteredList = useMemo(() => {
                 let result = processedData;
-                if (selectedArea !== 'Todas') result = result.filter(d => d.area === selectedArea);
+                if (selectedArea !== 'Todas') result = result.filter(d => d.area.trim() === selectedArea.trim());
                 if (searchTerm) result = result.filter(d => d.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-                
-                // Ordenar de Mayor a Menor Monto
                 return [...result].sort((a, b) => b.currentMonto - a.currentMonto);
             }, [processedData, selectedArea, searchTerm]);
 
@@ -139,9 +140,9 @@
             }, [filteredList]);
 
             const chartDataArea = useMemo(() => {
-                const areas = [...new Set(DATA.map(d => d.area))];
+                const areas = [...new Set(DATA.map(d => d.area.trim()))];
                 return areas.map(area => {
-                    const group = processedData.filter(p => p.area === area);
+                    const group = processedData.filter(p => p.area.trim() === area);
                     const monto = group.reduce((s, p) => s + p.currentMonto, 0);
                     const viajes = group.reduce((s, p) => s + p.currentViajes, 0);
                     return { name: area.split(' ')[0], monto, viajes };
@@ -149,44 +150,46 @@
             }, [processedData]);
 
             return (
-                <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-10">
+                <div className="min-h-screen p-2 sm:p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 sm:gap-10">
                     {/* HEADER */}
-                    <header className="rounded-[2.5rem] overflow-hidden shadow-2xl">
-                        <div className="cfe-gradient p-8 text-white">
-                            <div className="flex flex-col lg:flex-row justify-between items-center gap-8 relative z-10">
-                                <div className="flex items-center gap-6">
-                                    <div className="bg-white p-4 rounded-3xl shadow-xl flex items-center justify-center w-16 h-16">
-                                        <span className="text-[#006E46] font-black text-xl">CFE</span>
+                    <header className="rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-lg sm:shadow-2xl">
+                        <div className="cfe-gradient p-4 sm:p-8 text-white">
+                            <div className="flex flex-col lg:flex-row justify-between items-center gap-6 relative z-10">
+                                <div className="flex items-center gap-4 sm:gap-6">
+                                    <div className="bg-white p-3 sm:p-4 rounded-2xl shadow-xl flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16">
+                                        <span className="text-[#006E46] font-black text-lg sm:text-xl">CFE</span>
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-2 mb-1 text-[#A1D55D] font-bold text-[10px] uppercase tracking-widest">
-                                            <Icon name="ShieldCheck" className="w-4 h-4" /> CFE Calificados
+                                        <div className="flex items-center gap-2 mb-1 text-[#A1D55D] font-bold text-[9px] sm:text-[10px] uppercase tracking-widest">
+                                            <Icon name="ShieldCheck" className="w-3 h-3 sm:w-4 sm:h-4" /> CFE Calificados
                                         </div>
-                                        <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter">Reporte Uber 2025</h1>
+                                        <h1 className="text-2xl sm:text-3xl md:text-5xl font-black italic tracking-tighter">Reporte Uber 2025</h1>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-4 bg-black/10 p-3 rounded-3xl backdrop-blur-md border border-white/10 w-full lg:w-auto">
-                                    <div className="flex flex-col px-4 border-r border-white/10 min-w-[140px]">
-                                        <label className="text-[10px] font-black text-[#A1D55D] uppercase mb-1">Periodo</label>
-                                        <select 
-                                            className="bg-transparent text-sm font-bold outline-none cursor-pointer text-white"
-                                            value={selectedMonth}
-                                            onChange={(e) => setSelectedMonth(e.target.value)}
-                                        >
-                                            <option value="Todos" className="text-slate-900">Anual Consolidado</option>
-                                            {MESES_FULL.map(m => <option key={m} value={m} className="text-slate-900">{m}</option>)}
-                                        </select>
+                                <div className="flex flex-col sm:flex-row gap-3 bg-black/10 p-2 sm:p-3 rounded-2xl backdrop-blur-md border border-white/10 w-full lg:w-auto">
+                                    <div className="flex flex-col px-3 sm:px-4 sm:border-r border-white/10 min-w-[120px]">
+                                        <label className="text-[8px] sm:text-[10px] font-black text-[#A1D55D] uppercase mb-1">Periodo</label>
+                                        <div className="relative">
+                                            <select 
+                                                className="bg-transparent text-xs sm:text-sm font-bold outline-none cursor-pointer text-white w-full pr-4"
+                                                value={selectedMonth}
+                                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                            >
+                                                <option value="Todos" className="text-slate-900">Anual</option>
+                                                {MESES_FULL.map(m => <option key={m} value={m} className="text-slate-900">{m}</option>)}
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col px-4 min-w-[140px]">
-                                        <label className="text-[10px] font-black text-[#A1D55D] uppercase mb-1">Filtrar Área</label>
+                                    <div className="flex flex-col px-3 sm:px-4 min-w-[120px]">
+                                        <label className="text-[8px] sm:text-[10px] font-black text-[#A1D55D] uppercase mb-1">Filtrar Área</label>
                                         <select 
-                                            className="bg-transparent text-sm font-bold outline-none cursor-pointer text-white"
+                                            className="bg-transparent text-xs sm:text-sm font-bold outline-none cursor-pointer text-white w-full"
                                             value={selectedArea}
                                             onChange={(e) => setSelectedArea(e.target.value)}
                                         >
-                                            <option value="Todas" className="text-slate-900">Todas las áreas</option>
-                                            {[...new Set(DATA.map(d => d.area))].map(a => <option key={a} value={a} className="text-slate-900">{a}</option>)}
+                                            <option value="Todas" className="text-slate-900">Todas</option>
+                                            {[...new Set(DATA.map(d => d.area.trim()))].map(a => <option key={a} value={a} className="text-slate-900">{a}</option>)}
                                         </select>
                                     </div>
                                 </div>
@@ -194,64 +197,67 @@
                         </div>
                     </header>
 
-                    {/* KPIs */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* KPIs - 2x2 en iPhone */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                         {[
-                            {t: "Inversión Auditada", v: formatCurrency(stats.totalMonto), i: "DollarSign", c: "#006E46"},
-                            {t: "Servicios Uber", v: stats.totalViajes, i: "Car", c: "#00AE6E"},
-                            {t: "Ticket Promedio", v: formatCurrency(stats.avg), i: "TrendingUp", c: "#5C6670"},
-                            {t: "Usuarios Activos", v: filteredList.filter(p => p.currentViajes > 0).length, i: "Users", c: "#A2AAAD"}
+                            {t: "Inversión", v: formatCurrency(stats.totalMonto), i: "DollarSign", c: "#006E46"},
+                            {t: "Servicios", v: stats.totalViajes, i: "Car", c: "#00AE6E"},
+                            {t: "Promedio", v: formatCurrency(stats.avg), i: "TrendingUp", c: "#5C6670"},
+                            {t: "Activos", v: filteredList.filter(p => p.currentViajes > 0).length, i: "Users", c: "#A2AAAD"}
                         ].map((k, idx) => (
-                            <div key={idx} className="bg-white p-6 rounded-[2rem] shadow-sm border-b-4" style={{borderBottomColor: k.c}}>
-                                <div className="p-3 rounded-2xl text-white w-fit mb-4 shadow-lg" style={{backgroundColor: k.c}}><Icon name={k.i} /></div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{k.t}</p>
-                                <h3 className="text-2xl font-black text-[#006E46]">{k.v}</h3>
+                            <div key={idx} className="bg-white p-3 sm:p-6 rounded-2xl sm:rounded-[2rem] shadow-sm border-b-2 sm:border-b-4" style={{borderBottomColor: k.c}}>
+                                <div className="p-2 sm:p-3 rounded-xl text-white w-fit mb-2 sm:mb-4 shadow-md" style={{backgroundColor: k.c}}>
+                                    <Icon name={k.i} className="w-4 h-4 sm:w-6 sm:h-6" />
+                                </div>
+                                <p className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 truncate">{k.t}</p>
+                                <h3 className="text-sm sm:text-lg md:text-2xl font-black text-[#006E46] truncate">{k.v}</h3>
                             </div>
                         ))}
                     </div>
 
-                    {/* TABLA DE AUDITORÍA (Ahora arriba del gráfico) */}
-                    <div className="bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-100">
-                        <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                    {/* TABLA DE AUDITORÍA */}
+                    <div className="bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-100">
+                        <div className="p-4 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Detalle Individual de Auditoría</h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Ordenado de mayor a menor monto</p>
+                                <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800">Detalle de Auditoría</h3>
+                                <p className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase mt-0.5">Top gastos de {selectedMonth === 'Todos' ? 'el año' : selectedMonth}</p>
                             </div>
-                            <div className="relative w-full md:w-80">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
-                                    <Icon name="Search" className="w-4 h-4" />
+                            <div className="relative w-full sm:w-64">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300">
+                                    <Icon name="Search" className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </div>
                                 <input 
                                     type="text" 
-                                    placeholder="Buscar colaborador..." 
-                                    className="w-full pl-11 pr-6 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold focus:ring-4 focus:ring-[#006E46]/10 outline-none transition-all shadow-inner"
+                                    placeholder="Buscar..." 
+                                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-[#006E46]/10 outline-none transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left text-xs min-w-[750px]">
-                                <thead>
+                            <table className="w-full text-left text-[10px] sm:text-xs min-w-[600px]">
+                                <thead className="sticky top-0 bg-white z-10">
                                     <tr className="bg-slate-50/80 text-slate-400 font-black uppercase tracking-widest border-b border-slate-100">
-                                        <th className="px-10 py-6">Colaborador</th>
-                                        <th className="px-10 py-6">Área de Adscripción</th>
-                                        <th className="px-10 py-6 text-center">Viajes</th>
-                                        <th className="px-10 py-6 text-right">Inversión</th>
-                                        <th className="px-10 py-6 text-right">Ticket Prom.</th>
+                                        <th className="px-4 sm:px-10 py-3 sm:py-6">Colaborador</th>
+                                        <th className="px-4 sm:px-10 py-3 sm:py-6 text-center">Viajes</th>
+                                        <th className="px-4 sm:px-10 py-3 sm:py-6 text-right">Inversión</th>
+                                        <th className="px-4 sm:px-10 py-3 sm:py-6 text-right">Ticket Prom.</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
                                     {filteredList.map((p) => (
-                                        <tr key={p.num} className="hover:bg-emerald-50 transition-all group">
-                                            <td className="px-10 py-5">
-                                                <p className="font-black text-slate-800 group-hover:text-[#006E46] text-sm">{p.nombre}</p>
-                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Audit ID: {String(p.num).padStart(3, '0')}</p>
+                                        <tr key={p.num} 
+                                            onClick={() => setSelectedPerson(p === selectedPerson ? null : p)}
+                                            className={`hover:bg-emerald-50 transition-all group cursor-pointer ${selectedPerson?.num === p.num ? 'bg-emerald-50' : ''}`}
+                                        >
+                                            <td className="px-4 sm:px-10 py-3 sm:py-5">
+                                                <p className="font-black text-slate-800 group-hover:text-[#006E46]">{p.nombre}</p>
+                                                <p className="text-[8px] text-slate-400 font-bold uppercase">{p.area}</p>
                                             </td>
-                                            <td className="px-10 py-5"><span className="text-[9px] font-black px-3 py-1 rounded-xl bg-white border border-slate-200 text-slate-500 uppercase">{p.area}</span></td>
-                                            <td className="px-10 py-5 text-center font-bold text-slate-600">{p.currentViajes || '-'}</td>
-                                            <td className="px-10 py-5 text-right font-black text-slate-900">{p.currentMonto > 0 ? formatCurrency(p.currentMonto) : '-'}</td>
-                                            <td className="px-10 py-5 text-right font-bold text-[#00AE6E]">{p.currentViajes > 0 ? formatCurrency(p.currentMonto / p.currentViajes) : '-'}</td>
+                                            <td className="px-4 sm:px-10 py-3 sm:py-5 text-center font-bold text-slate-600">{p.currentViajes || '-'}</td>
+                                            <td className="px-4 sm:px-10 py-3 sm:py-5 text-right font-black text-slate-900">{p.currentMonto > 0 ? formatCurrency(p.currentMonto) : '-'}</td>
+                                            <td className="px-4 sm:px-10 py-3 sm:py-5 text-right font-bold text-[#00AE6E]">{p.currentViajes > 0 ? formatCurrency(p.currentMonto / p.currentViajes) : '-'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -259,43 +265,64 @@
                         </div>
                     </div>
 
-                    {/* GRÁFICO POR ÁREA (Ahora al final) */}
-                    <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-sm overflow-hidden mb-10">
-                        <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
-                            <h3 className="text-sm font-black uppercase tracking-widest text-[#006E46] flex items-center gap-3 text-center sm:text-left">
-                                <div className="w-1.5 h-6 rounded-full bg-[#006E46]"></div>
-                                Análisis Comparativo de Eficiencia por Área
-                            </h3>
-                            <div className="flex gap-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-[#006E46]"></div>
-                                    <span className="text-[10px] font-bold uppercase text-slate-400">Gasto ($)</span>
+                    {/* FICHA DETALLE (Solo aparece al tocar un empleado en móvil) */}
+                    {selectedPerson && (
+                        <div className="bg-[#004D31] text-white p-5 rounded-2xl shadow-xl animate-in fade-in slide-in-from-bottom-4">
+                            <div className="flex justify-between items-start mb-4">
+                                <h4 className="font-black text-sm uppercase tracking-widest text-[#A1D55D]">Ficha Técnica Individual</h4>
+                                <button onClick={() => setSelectedPerson(null)}><Icon name="X" className="w-5 h-5 opacity-50" /></button>
+                            </div>
+                            <div className="flex gap-4 items-center mb-4">
+                                <div className="bg-white/10 p-2 rounded-lg"><Icon name="Users" className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="font-black text-lg leading-tight">{selectedPerson.nombre}</p>
+                                    <p className="text-[10px] opacity-60 uppercase">{selectedPerson.area}</p>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-[#00AE6E]"></div>
-                                    <span className="text-[10px] font-bold uppercase text-slate-400">Viajes (Qty)</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-black/20 p-3 rounded-xl border border-white/5">
+                                    <p className="text-[8px] opacity-50 uppercase font-bold mb-1">Monto en Periodo</p>
+                                    <p className="text-sm font-black">{formatCurrency(selectedPerson.currentMonto)}</p>
+                                </div>
+                                <div className="bg-black/20 p-3 rounded-xl border border-white/5">
+                                    <p className="text-[8px] opacity-50 uppercase font-bold mb-1">Viajes en Periodo</p>
+                                    <p className="text-sm font-black">{selectedPerson.currentViajes}</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="h-[350px] w-full">
+                    )}
+
+                    {/* GRÁFICO POR ÁREA */}
+                    <div className="bg-white p-4 sm:p-10 rounded-2xl sm:rounded-[3rem] shadow-sm overflow-hidden mb-6 sm:mb-10">
+                        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-10 gap-4">
+                            <h3 className="text-[10px] sm:text-sm font-black uppercase tracking-widest text-[#006E46] flex items-center gap-2">
+                                <div className="w-1 h-4 sm:w-1.5 sm:h-6 rounded-full bg-[#006E46]"></div>
+                                Eficiencia por Centro de Costos
+                            </h3>
+                            <div className="flex gap-4">
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#006E46]"></div><span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-400">Gasto</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#00AE6E]"></div><span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-400">Viajes</span></div>
+                            </div>
+                        </div>
+                        <div className="h-[250px] sm:h-[400px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <ComposedChart data={chartDataArea} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                <ComposedChart data={chartDataArea} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
                                     <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10, fontWeight: 'bold'}} />
-                                    <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} />
-                                    <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#00AE6E', fontSize: 10}} />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 8, fontWeight: 'bold'}} />
+                                    <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 8}} />
+                                    <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#00AE6E', fontSize: 8}} />
                                     <Tooltip 
-                                        contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px'}}
+                                        contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 20px rgba(0,0,0,0.1)', fontSize: '10px'}}
                                         formatter={(val, name) => [name === 'monto' ? formatCurrency(val) : val, name === 'monto' ? 'Inversión' : 'Viajes']}
                                     />
-                                    <Bar yAxisId="left" dataKey="monto" fill="#006E46" radius={[10, 10, 0, 0]} barSize={40} />
-                                    <Bar yAxisId="right" dataKey="viajes" fill="#00AE6E" radius={[10, 10, 0, 0]} barSize={40} />
+                                    <Bar yAxisId="left" dataKey="monto" fill="#006E46" radius={[6, 6, 0, 0]} barSize={window.innerWidth < 640 ? 20 : 40} />
+                                    <Bar yAxisId="right" dataKey="viajes" fill="#00AE6E" radius={[6, 6, 0, 0]} barSize={window.innerWidth < 640 ? 20 : 40} />
                                 </ComposedChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
 
-                    <footer className="text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.8em] py-10">
+                    <footer className="text-center text-slate-400 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.4em] sm:tracking-[0.8em] py-8 sm:py-16">
                         Inteligencia Financiera • CFE Calificados • 2025
                     </footer>
                 </div>
